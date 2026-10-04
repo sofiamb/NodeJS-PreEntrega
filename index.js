@@ -70,11 +70,12 @@ async function obtenerProductoEspecifico(recurso){
         const respuesta = await fetch (urlProducto);
 
         if(!respuesta.ok){
-            throw new Error(`error al obtener el producto: ${respuesta.status}`);
+            throw new Error(`error al obtener el producto+: ${respuesta.status}`);
         }
 
         const producto = await respuesta.json();
-            
+        console.log(producto);
+
         //Destructuring
         const{ title, category, price} = producto;        
         console.log(`${title} - ${price} - ${category}`);
@@ -91,18 +92,11 @@ async function obtenerProductoEspecifico(recurso){
 //Producto Nuevo - Promesa
 const crearProductoNuevo = () => {
 
-    fetch(urlPost, configuracionPOST)
-        //.then((respuesta) => respuesta.json())
-        .then((respuesta) => {
-        console.log("URL:", respuesta.url);
-        console.log("Status:", respuesta.status);
-        console.log("Content-Type:", respuesta.headers.get("content-type"));
-
-        return respuesta.json();
-        })
-        .then((data) => console.log(data))
-        .catch((error) => console.error('Error: ', error));
-
+   fetch(urlPost, configuracionPOST)
+    .then((respuesta) => respuesta.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error: ", error));
+       
     console.log(`${productoNuevo.title} - ${productoNuevo.price} - ${productoNuevo.category}`);
     
 };
@@ -123,7 +117,8 @@ async function eliminarProducto(){
         }
 
         const producto = await respuesta.json();
-            
+        console.log(producto);
+        
         //Destructuring
         const{ title, category, price} = producto;        
         console.log(`${title} - ${price} - ${category}`);
@@ -138,8 +133,8 @@ async function eliminarProducto(){
 
 };
 
-// funcion principal
-function seleccionarFuncion(){
+// funcion principal/main
+function main(){
 
    // console.log(metodo);
    // console.log(recurso);
@@ -162,4 +157,4 @@ function seleccionarFuncion(){
   
 }
 
-seleccionarFuncion();
+main();
