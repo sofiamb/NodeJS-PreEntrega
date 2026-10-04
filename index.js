@@ -1,8 +1,6 @@
-//console.log("Hola, este es mi programa");
-
+//console.log("Hola, soy Sofía y este es mi programa.");
 
 const [metodo, recurso, ...elementosRestantes] = process.argv.slice(2);
-
 
 //console.log(metodo);
 //console.log(recurso);
@@ -10,35 +8,32 @@ const [metodo, recurso, ...elementosRestantes] = process.argv.slice(2);
 const url = "https://dummyjson.com/products";
 const urlPost = "https://dummyjson.com/products/add";
 
-//spread
+
+
 const [titulo, precio, categoria] = elementosRestantes;
 
 const productoNuevo = {
     title : titulo,
     price : precio,
-    category : categoria
-   
+    category : categoria   
+};
+//Spread
+const productoParaEnviar = {
+    ...productoNuevo,
+    price: Number(productoNuevo.price)
 };
 
-const configuracion = {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(productoNuevo)
+const configuracionPOST = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+  body: JSON.stringify(productoParaEnviar)
 };
 
-async function seleccionarFuncion(){
-
-   // console.log(metodo);
-   // console.log(recurso);
-    if(metodo === "GET" && recurso === "products"){
-
-        obtenerTodosLosProductos();
-    }else{
-        obtenerProductoEspecifico(recurso);
-    }
-}
+const configuracionDELETE = {
+    method: 'DELETE',
+};
 
 //Obtener todos los productos
 async function obtenerTodosLosProductos(){
@@ -47,7 +42,7 @@ async function obtenerTodosLosProductos(){
         const respuesta = await fetch (url);
 
         if(!respuesta.ok){
-            throw new Error(`error al obteners los productos: ${respuesta.status}`);
+            throw new Error(`error al obtener los productos: ${respuesta.status}`);
         }
 
         const producto = await respuesta.json();
@@ -75,7 +70,7 @@ async function obtenerProductoEspecifico(recurso){
         const respuesta = await fetch (urlProducto);
 
         if(!respuesta.ok){
-            throw new Error(`error al obteners los productos: ${respuesta.status}`);
+            throw new Error(`error al obtener el producto: ${respuesta.status}`);
         }
 
         const producto = await respuesta.json();
@@ -96,7 +91,7 @@ async function obtenerProductoEspecifico(recurso){
 //Producto Nuevo - Promesa
 const crearProductoNuevo = () => {
 
-    fetch(urlPost, configuracion)
+    fetch(urlPost, configuracionPOST)
         //.then((respuesta) => respuesta.json())
         .then((respuesta) => {
         console.log("URL:", respuesta.url);
@@ -111,9 +106,60 @@ const crearProductoNuevo = () => {
     console.log(`${productoNuevo.title} - ${productoNuevo.price} - ${productoNuevo.category}`);
     
 };
+//Eliminar producto
+async function eliminarProducto(){
 
-//Funciones
-//seleccionarFuncion();
-//obtenerTodosLosProductos();
-//obtenerProductoEspecifico();
-crearProductoNuevo();
+    const idRecortado = recurso.split("/");
+    
+    //template literal 
+    const urlProducto = `${url}/${idRecortado[1]}`;
+   
+       
+    try{
+        const respuesta = await fetch (urlProducto, configuracionDELETE);
+
+        if(!respuesta.ok){
+            throw new Error(`error al eliminar el producto: ${respuesta.status}`);
+        }
+
+        const producto = await respuesta.json();
+            
+        //Destructuring
+        const{ title, category, price} = producto;        
+        console.log(`${title} - ${price} - ${category}`);
+     
+    }catch(error){
+
+        console.error ("Error: ", error.message);
+    }finally{
+        console.log ("Operación finalizada");
+    }    
+
+
+};
+
+// funcion principal
+function seleccionarFuncion(){
+
+   // console.log(metodo);
+   // console.log(recurso);
+   switch(metodo){
+    case "GET":
+        const idRecortado = recurso.split("/");
+        if(idRecortado[1]){
+            obtenerProductoEspecifico(recurso);
+        }else{
+            obtenerTodosLosProductos();
+        }  
+        break;  
+    case "POST":
+        crearProductoNuevo();
+        break;
+    case "DELETE":
+        eliminarProducto();
+        break;
+   }
+  
+}
+
+seleccionarFuncion();
